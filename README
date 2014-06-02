@@ -1,0 +1,10 @@
+#Need Cython version >0.19
+tar -zxvf Cython-0.20.1.tar.gz
+cd Cython-0.20.1
+python setup.py install
+#need numpy:
+python setup.py install --user
+
+export PYTHONPATH=${PYTHONPATH}:/home/philip/workspace/wordcup/src
+
+
