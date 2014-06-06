@@ -17,6 +17,9 @@ class Match(object):
     def __init__(self, init_team_a, init_team_b):
         self.team_a = init_team_a
         self.team_b = init_team_b
+        self.cont_a_fact = 1;
+        self.cont_b_fact = 1;
+        self.set_continent_factor(init_team_a.continent, init_team_b.continent)        
         self.goals_a = 0
         self.goals_b = 0
         self.play_match()
@@ -32,14 +35,21 @@ class Match(object):
         self.goals_b = r2
 
         print team_a.name," ", r1, " - ", r2, " ", team_b.name
+    
+    def set_continent_factor(self, cont1, cont2):
+        """ numbers derived from last three world cups, weights for continets teams to get through to last 16"""
+        facts = {"NA": 1.06, "SA": 1.52, "AF": 0.4, "EU": 1.26, "AS": 0.76}
+        self.cont_a_fact = (2*facts[cont1])/(facts[cont1]+facts[cont2])
+        self.cont_b_fact = (2*facts[cont2])/(facts[cont1]+facts[cont2])
+
 
 
 class GroupMatch(Match):
     def play_match(self):
         team_a = self.team_a
         team_b = self.team_b
-        goals_a = (team_a.goals_scored_per_game+team_b.goals_conceded_per_game)/2
-        goals_b = (team_a.goals_conceded_per_game+team_b.goals_scored_per_game)/2
+        goals_a = self.cont_a_fact*(team_a.goals_scored_per_game+team_b.goals_conceded_per_game)/2
+        goals_b = self.cont_b_fact*(team_a.goals_conceded_per_game+team_b.goals_scored_per_game)/2
         r1 = np.random.poisson(goals_a)
         r2 = np.random.poisson(goals_b)
         self.goals_a = r1
@@ -62,13 +72,23 @@ class GroupMatch(Match):
         print team_a.name," ", r1, " - ", r2, " ", team_b.name
 
 class KOMatch(Match):
-    
-    
+    def __init__(self, init_team_a, init_team_b, init_stage):
+        self.stage = init_stage
+        self.team_a = init_team_a
+        self.team_b = init_team_b
+        self.cont_a_fact = 1;
+        self.cont_b_fact = 1;
+        self.set_continent_factor(init_team_a.continent, init_team_b.continent)        
+        self.goals_a = 0
+        self.goals_b = 0
+        self.play_match()
+        
     def play_match(self):
+        
         team_a = self.team_a
         team_b = self.team_b
-        goals_a = (team_a.goals_scored_per_game+team_b.goals_conceded_per_game)/2
-        goals_b = (team_a.goals_conceded_per_game+team_b.goals_scored_per_game)/2
+        goals_a = self.cont_a_fact*(team_a.goals_scored_per_game+team_b.goals_conceded_per_game)/2
+        goals_b = self.cont_b_fact*(team_a.goals_conceded_per_game+team_b.goals_scored_per_game)/2
         r1 = np.random.poisson(goals_a)
         r2 = np.random.poisson(goals_b)
         self.goals_a = r1
@@ -79,17 +99,35 @@ class KOMatch(Match):
         #if scores are level will need to add extra time and penalties (better model). For now just assign random num
         if r1 > r2:
             self.win = team_a
+            self.increment_ko(team_b)
         elif r2 > r1:
             self.win = team_b
+            self.increment_ko(team_a)
         else:
             rand_u = np.random.uniform(0,1,1)
             if rand_u <= 0.5:
                 self.win = team_a
+                self.increment_ko(team_b)
             else:
                 self.win = team_b 
-           
+                self.increment_ko(team_a)
+        
+        if self.stage == "Final":
+            self.win.n_win_final += 1
+                
         print team_a.name," ", r1, " - ", r2, " ", team_b.name
-
+    
+    def increment_ko(self, team_lose):
+        if self.stage == "16":
+            team_lose.n_ko_16 += 1
+        elif self.stage == "QF":
+            team_lose.n_ko_qf += 1
+        elif self.stage == "SF":
+            team_lose.n_ko_sf += 1
+        elif self.stage == "Final":
+            team_lose.n_ru_final += 1    
+            
+        
 #Brazil = Team("Brazil")
 ##Brazil.print_games_and_goals()
 #Argentina = Team("Argentina")

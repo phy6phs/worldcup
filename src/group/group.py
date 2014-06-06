@@ -6,6 +6,7 @@ Created on Jun 1, 2014
 
 from match.match import Match, GroupMatch, KOMatch
 from team.team import Team 
+from operator import itemgetter, attrgetter
 
 class Group(object):
     '''
@@ -63,100 +64,129 @@ class Group(object):
         #print s3
         self.team_1 = s3[0][0]
         self.team_2 = s3[1][0]
-
-print '''Tournament'''
-print '''group A'''        
-Brazil = Team("Brazil")
-Croatia = Team("Croatia")
-Mexico = Team("Mexico")
-Cameroon = Team("Cameroon")
+        Team3 = s3[2][0]
+        Team4 = s3[3][0]
+        Team3.n_ko_group += 1
+        Team4.n_ko_group += 1
         
-GroupA = Group(Brazil, Croatia, Mexico, Cameroon)        
-GroupA.sort_group()
-
-print '''group B'''      
-Spain = Team("Spain")
-Netherlands = Team("Netherlands")
-Chile = Team("Chile")
-Australia = Team("Australia")        
-
-GroupB = Group(Spain, Netherlands, Chile, Australia)
+        #for now do for all teams
+        self.reset_group_info(TeamA)
+        self.reset_group_info(TeamB)
+        self.reset_group_info(TeamC)
+        self.reset_group_info(TeamD)
         
-print '''Group C'''
-Colombia = Team("Colombia")
-Greece = Team("Greece")
-Ivory_Coast = Team("Cote dIvoire")
-Japan  = Team("Japan")
+    def reset_group_info(self, team_input):
+            team_input.group_pts = 0
+            team_input.group_goals_scored = 0
+            team_input.group_goals_conceded = 0
+            
+#wc_team_names = ["Brazil", "Croatia", "Mexico", "Cameroon", "Spain", "Netherlands", "Chile", "Australia", "Colombia", "Greece", 
+#                 "Cote dIvoire", "Japan", "Uruguay", "Costa Rica", "England", "Italy", "Switzerland", "Ecuador", "France", 
+#                 "Honduras", "Argentina", "Bosnia-Herzegovina", "Iran", "Nigeria", "Germany", "Portugal", "Ghana", "United States",
+#                 "Belgium", "Algeria", "Russia", "Korea Republic"
+#                 ]
+#win_rate = []
+#
+#for wc_team in wc_team_names:
+#    Temp = Team(wc_team)
+#    rate = [wc_team, Temp.win_percentage]    
+#    win_rate.append(rate)
+#    
+#sort = sorted(win_rate, key=itemgetter(1), reverse=True)
+#
+#for i in range(0,32):
+#    print sort[i][0], ": ", sort[i][1]
+  
+Brazil = Team("Brazil", "SA")
+Croatia = Team("Croatia", "EU")
+Mexico = Team("Mexico", "NA")
+Cameroon = Team("Cameroon", "AF")
 
-GroupC = Group(Colombia, Greece, Ivory_Coast, Japan)      
+Spain = Team("Spain", "EU")
+Netherlands = Team("Netherlands", "EU")
+Chile = Team("Chile", "SA")
+Australia = Team("Australia", "AS")        
+       
+Colombia = Team("Colombia", "SA")
+Greece = Team("Greece", "EU")
+Ivory_Coast = Team("Cote dIvoire", "AF")
+Japan  = Team("Japan", "AS")
         
-print '''Group D'''
-Uruguay = Team("Uruguay")
-Costa_Rica = Team("Costa Rica")
-England = Team("England")
-Italy = Team("Italy")
+Uruguay = Team("Uruguay", "SA")
+Costa_Rica = Team("Costa Rica", "NA")
+England = Team("England", "EU")
+Italy = Team("Italy", "EU")
 
-GroupD = Group(Uruguay, Costa_Rica, England, Italy)
+Switzerland = Team("Switzerland", "EU")
+Ecuador = Team("Ecuador", "SA")
+France = Team("France", "EU")
+Honduras = Team("Honduras", "NA")
 
-print '''Group E'''
-Switzerland = Team("Switzerland")
-Ecuador = Team("Ecuador")
-France = Team("France")
-Honduras = Team("Honduras")
-
-GroupE = Group(Switzerland, Ecuador, France, Honduras)
-
-print '''Group F'''
-Argentina = Team("Argentina")
+Argentina = Team("Argentina", "SA")
 Bosnia_Herzegovina = Team("Bosnia-Herzegovina")
-Iran = Team("Iran")
-Nigeria = Team("Nigeria")
+Iran = Team("Iran", "AS")
+Nigeria = Team("Nigeria", "AF")
 
-GroupF = Group(Argentina, Bosnia_Herzegovina, Iran, Nigeria)
+Germany = Team("Germany", "EU")
+Portugal = Team("Portugal", "EU")
+Ghana = Team("Ghana", "AF")
+United_States = Team("United States", "NA")
 
-print '''Group G'''
-Germany = Team("Germany")
-Portugal = Team("Portugal")
-Ghana = Team("Ghana")
-United_States = Team("United States")
+Belgium = Team("Belgium", "EU")
+Algeria = Team("Algeria", "AF")
+Russia = Team("Russia", "EU")
+South_Korea = Team("Korea Republic", "AS")
 
-GroupG = Group(Germany, Portugal, Ghana, United_States)
+for i in range(0, 1000):
+    print '''Tournament ''', i
+    print '''group A'''  
+    GroupA = Group(Brazil, Croatia, Mexico, Cameroon)        
+    print '''group B'''      
+    GroupB = Group(Spain, Netherlands, Chile, Australia)
+    print '''Group C'''
+    GroupC = Group(Colombia, Greece, Ivory_Coast, Japan)  
+    print '''Group D'''
+    GroupD = Group(Uruguay, Costa_Rica, England, Italy)
+    print '''Group E'''
+    GroupE = Group(Switzerland, Ecuador, France, Honduras)
+    print '''Group F'''
+    GroupF = Group(Argentina, Bosnia_Herzegovina, Iran, Nigeria)
+    print '''Group G'''
+    GroupG = Group(Germany, Portugal, Ghana, United_States)
+    print '''Group H'''
+    GroupH = Group(Belgium, Algeria, Russia, South_Korea)
+    
+    print '''Round of 16'''
+    Match16_1 = KOMatch(GroupA.team_1, GroupB.team_2, "16")
+    Match16_2 = KOMatch(GroupA.team_2, GroupB.team_1, "16")
+    Match16_3 = KOMatch(GroupC.team_1, GroupD.team_2, "16")
+    Match16_4 = KOMatch(GroupC.team_2, GroupD.team_1, "16")
+    Match16_5 = KOMatch(GroupE.team_1, GroupF.team_2, "16")
+    Match16_6 = KOMatch(GroupE.team_2, GroupF.team_1, "16")
+    Match16_7 = KOMatch(GroupG.team_1, GroupH.team_2, "16")
+    Match16_8 = KOMatch(GroupG.team_2, GroupH.team_1, "16")
+    
+    print '''Quarter Final'''
+    MatchQ_1 = KOMatch(Match16_1.win, Match16_3.win, "QF")
+    MatchQ_2 = KOMatch(Match16_2.win, Match16_4.win, "QF")
+    MatchQ_3 = KOMatch(Match16_5.win, Match16_7.win, "QF")
+    MatchQ_4 = KOMatch(Match16_6.win, Match16_8.win, "QF")
+    
+    print '''Semi Final'''
+    MatchS_1 = KOMatch(MatchQ_1.win, MatchQ_3.win, "SF")
+    MatchS_2 = KOMatch(MatchQ_2.win, MatchQ_4.win, "SF")
+    
+    print '''Final'''
+    MatchF = KOMatch(MatchS_1.win, MatchS_2.win, "Final")
+    
+    Winner = MatchF.win
+    print "Winner is: ", Winner.name, "!"
 
-print '''Group H'''
-Belgium = Team("Belgium")
-Algeria = Team("Algeria")
-Russia = Team("Russia")
-South_Korea = Team("Korea Republic")
-
-GroupH = Group(Belgium, Algeria, Russia, South_Korea)
-
-print '''Round of 16'''
-Match16_1 = KOMatch(GroupA.team_1, GroupB.team_2)
-Match16_2 = KOMatch(GroupA.team_2, GroupB.team_1)
-Match16_3 = KOMatch(GroupC.team_1, GroupD.team_2)
-Match16_4 = KOMatch(GroupC.team_2, GroupD.team_1)
-Match16_5 = KOMatch(GroupE.team_1, GroupF.team_2)
-Match16_6 = KOMatch(GroupE.team_2, GroupF.team_1)
-Match16_7 = KOMatch(GroupG.team_1, GroupH.team_2)
-Match16_8 = KOMatch(GroupG.team_2, GroupH.team_1)
-
-print '''Quarter Final'''
-MatchQ_1 = KOMatch(Match16_1.win, Match16_3.win)
-MatchQ_2 = KOMatch(Match16_2.win, Match16_4.win)
-MatchQ_3 = KOMatch(Match16_5.win, Match16_7.win)
-MatchQ_4 = KOMatch(Match16_6.win, Match16_8.win)
-
-print '''Semi Final'''
-MatchS_1 = KOMatch(MatchQ_1.win, MatchQ_3.win)
-MatchS_2 = KOMatch(MatchQ_2.win, MatchQ_4.win)
-
-print '''Final'''
-MatchF = KOMatch(MatchS_1.win, MatchS_2.win)
-
-Winner = MatchF.win
-print "Winner is: ", Winner.name, "!"
-
-
+#will have to put teams in to a list and then loop ove the list!
+print "Bra ko: ", Brazil.n_ko_group, "\t", Brazil.n_ko_16, "\t", Brazil.n_ko_qf, "\t", Brazil.n_ko_sf, "\t", Brazil.n_ru_final, "\t", Brazil.n_win_final
+print "Eng ko: ", England.n_ko_group, "\t", England.n_ko_16, "\t", England.n_ko_qf, "\t", England.n_ko_sf, "\t", England.n_ru_final, "\t", England.n_win_final
+print "Spa ko: ", Spain.n_ko_group, "\t", Spain.n_ko_16, "\t", Spain.n_ko_qf, "\t", Spain.n_ko_sf, "\t", Spain.n_ru_final, "\t", Spain.n_win_final
+print "Ira ko: ", Iran.n_ko_group, "\t", Iran.n_ko_16, "\t", Iran.n_ko_qf, "\t", Iran.n_ko_sf, "\t", Iran.n_ru_final, "\t", Iran.n_win_final
 
 
         
