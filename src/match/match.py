@@ -37,7 +37,7 @@ class Match(object):
         print team_a.name," ", r1, " - ", r2, " ", team_b.name
     
     def set_continent_factor(self, cont1, cont2):
-        """ numbers derived from last three world cups, weights for continets teams to get through to last 16"""
+        """ numbers derived from last three world cups, weights for continents teams to get through to last 16"""
         facts = {"NA": 1.06, "SA": 1.52, "AF": 0.4, "EU": 1.26, "AS": 0.76}
         self.cont_a_fact = (2*facts[cont1])/(facts[cont1]+facts[cont2])
         self.cont_b_fact = (2*facts[cont2])/(facts[cont1]+facts[cont2])
@@ -48,8 +48,15 @@ class GroupMatch(Match):
     def play_match(self):
         team_a = self.team_a
         team_b = self.team_b
-        goals_a = self.cont_a_fact*(team_a.goals_scored_per_game+team_b.goals_conceded_per_game)/2
-        goals_b = self.cont_b_fact*(team_a.goals_conceded_per_game+team_b.goals_scored_per_game)/2
+        
+        home_factor = 1
+        if team_a.name == "Brazil":
+            home_factor = 1.4
+        if team_b.name == "Brazil":
+            home_factor = 1.4
+        
+        goals_a = home_factor*self.cont_a_fact*(team_a.goals_scored_per_game+team_b.goals_conceded_per_game)/2
+        goals_b = home_factor*self.cont_b_fact*(team_a.goals_conceded_per_game+team_b.goals_scored_per_game)/2
         r1 = np.random.poisson(goals_a)
         r2 = np.random.poisson(goals_b)
         self.goals_a = r1
@@ -84,11 +91,18 @@ class KOMatch(Match):
         self.play_match()
         
     def play_match(self):
-        
+
         team_a = self.team_a
         team_b = self.team_b
-        goals_a = self.cont_a_fact*(team_a.goals_scored_per_game+team_b.goals_conceded_per_game)/2
-        goals_b = self.cont_b_fact*(team_a.goals_conceded_per_game+team_b.goals_scored_per_game)/2
+
+        home_factor = 1
+        if team_a.name == "Brazil":
+            home_factor = 1.4
+        if team_b.name == "Brazil":
+            home_factor = 1.4
+        
+        goals_a = home_factor*self.cont_a_fact*(team_a.goals_scored_per_game+team_b.goals_conceded_per_game)/2
+        goals_b = home_factor*self.cont_b_fact*(team_a.goals_conceded_per_game+team_b.goals_scored_per_game)/2
         r1 = np.random.poisson(goals_a)
         r2 = np.random.poisson(goals_b)
         self.goals_a = r1

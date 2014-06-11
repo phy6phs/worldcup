@@ -2,8 +2,10 @@
 tar -zxvf Cython-0.20.1.tar.gz
 cd Cython-0.20.1
 python setup.py install
-#need numpy:
-python setup.py install --user
+
+Scipy packages:
+http://www.scipy.org/install.html
+sudo apt-get install python-numpy python-scipy python-matplotlib ipython ipython-notebook python-pandas python-sympy python-nose
 
 export PYTHONPATH=${PYTHONPATH}:/home/philip/workspace/wordcup/src
 

@@ -6,6 +6,14 @@ Created on May 27, 2014
 
 import csv
 import datetime
+##import matplotlib.mlab as mlab
+from scipy import optimize
+import matplotlib.pyplot as plt
+from collections import Counter
+import numpy as np
+import math 
+from scipy.misc import factorial
+import pylab 
 
 class Team(object):
     def __init__(self, initial_name = "Brazil", initial_continent = "SA"):
@@ -32,6 +40,8 @@ class Team(object):
         self.home_draws = 0
         self.away_draws = 0
         self.neutral_draws = 0
+        #for plotting
+        self.goals_list = []
         #goal info
         self.goals_scored = 0
         self.home_goals_scored = 0
@@ -55,12 +65,12 @@ class Team(object):
         self.group_goals_scored = 0
         self.group_goals_conceded = 0
         #for what stage of competition exit
-        self.n_ko_group = 0
-        self.n_ko_16 = 0
-        self.n_ko_qf = 0
-        self.n_ko_sf = 0
-        self.n_ru_final = 0
-        self.n_win_final = 0   
+        self.n_ko_group = 0.
+        self.n_ko_16 = 0.
+        self.n_ko_qf = 0.
+        self.n_ko_sf = 0.
+        self.n_ru_final = 0.
+        self.n_win_final = 0.  
 
     def get_rank(self):   
         ranks = []
@@ -92,6 +102,12 @@ class Team(object):
             else:
                 continue        
             
+            #histogram example
+            if (home_team == self.name):
+                self.goals_list.append(home_goals)
+            elif (away_team == self.name):
+                self.goals_list.append(away_goals)  
+            
             #assign the date from a string 
             dt = datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
             
@@ -118,7 +134,55 @@ class Team(object):
             self.away_win_percentage = 100*float(self.away_wins)/self.away_games
         if self.neutral_games > 0:
             self.neutral_win_percentage = 100*float(self.neutral_wins)/self.neutral_games   
+    
+    def make_goals_plot(self):
+        # the histogram of the data
+        goals = self.goals_list
+        mean_g = np.mean(goals)
+        std_g = np.std(goals)
+        data = Counter(goals)
+#        print data.most_common()
+        
+        gls = zip(*data.most_common())
+        n_gls = gls[0]  # Returns all unique items and their counts
+        mult_gls = gls[1]
+        gls_sorted = list(n_gls)
+        gls_sorted = sorted(gls_sorted)
+        mult_gls_errs = np.sqrt(mult_gls)
+        
+        fitfunc = lambda p, x: (self.games*(p[0]**x)*math.exp(-p[0]))/factorial(x) # Target function
+        errfunc = lambda p, x, y: fitfunc(p, x) - y # Distance to the target function
+        p0 = [1.] # Initial guess for the parameters
+        p1, success = optimize.leastsq(errfunc, p0[:], args=(n_gls, mult_gls))
+        
+        fig = pylab.figure()
+#        fig, ax = plt.subplots()
+#        ax.plot(mult_gls, 'k.', label='data')
+#        ax.plot(fitfunc(p1, gls_sorted), 'r-', label='$\mathrm{Poissonian\ fit}, \mu= %3.3f$' % (p1[0]))
+        
+        plt.plot(fitfunc(p1, gls_sorted), "r-", label = '$\mathrm{Poissonian\ fit}, \mu= %3.3f$' % (p1[0]))
+        
+        max_y = data.most_common(1)  # Returns the highest occurring item
+        max_x = max(goals)+1
+#       plt.hist(goals, 20, facecolor='green'), #normed=np.sum(mult_gls)
+        
+        #if you want error bars
+        plt.errorbar(n_gls, mult_gls, yerr=mult_gls_errs, fmt='k.', label = 'data')
+        #plt.text(4, 25, '$\mathrm{Poissonian\ fit}, \mu= %3.3f$' % (p1[0]))
+#        plt.legend([n_gls, fitfunc(p1, gls_sorted)], ['fit', 'hist'])
+#        plt.text(5, 5.5, 'Index = %5.2f +/- %5.2f' % (index, indexErr))
+        legend = plt.legend(loc='upper right', shadow=True)
+        plt.xlabel('Number of Goals Scored')
+        plt.ylabel('Games')
+        string = '$\mathrm{Histogram\ of\ Goals:}\ \mu=%3.3f,\ \sigma=%3.3f$'%(mean_g, std_g)
+        plt.title(string)
+        plt.axis([-0.5, max_x, 0, max_y[0][1]+10]) #unnormalised
+#       plt.axis([-0.5, max_x, 0, 1.5]) #normalised
+        plt.grid(True)
 
+#       plt.show()
+        fig.savefig('../plots/'+self.name+'_Gls_Scored.png')
+        fig.savefig('../plots/'+self.name+'_Gls_Scored.pdf')
         
     def print_info(self):
         print "************************************************************"
@@ -181,7 +245,7 @@ class Team(object):
             neutral = int(row["neutral"])
                        
             if home_team == self.name or away_team == self.name:
-                print date+", "+home_team+" ",home_goals,"-",away_goals," "+away_team+" :",neutral
+                print date+", "+home_team+", ",away_team,", ",home_goals,", ",away_goals,", ",neutral
 
     def set_home_info(self, for_goals, against_goals):
         self.goals_scored += for_goals
