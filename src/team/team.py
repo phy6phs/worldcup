@@ -75,7 +75,7 @@ class Team(object):
     def get_rank(self):   
         ranks = []
         
-        with open('../rankings.csv','r') as f:
+        with open('./rankings.csv','r') as f:
             next(f)
             reader=csv.reader(f,delimiter='\t')
             for rank in reader:
@@ -84,7 +84,7 @@ class Team(object):
         return ranks                          
 
     def get_info(self): #scored and conceded
-        input_file = csv.DictReader(open("../results.csv"))
+        input_file = csv.DictReader(open("./results.csv"))
         
         rankings = self.get_rank()
                             
@@ -181,8 +181,8 @@ class Team(object):
         plt.grid(True)
 
 #       plt.show()
-        fig.savefig('../plots/'+self.name+'_Gls_Scored.png')
-        fig.savefig('../plots/'+self.name+'_Gls_Scored.pdf')
+        fig.savefig('./'+self.name+'_Gls_Scored.png')
+        fig.savefig('./'+self.name+'_Gls_Scored.pdf')
         
     def print_info(self):
         print "************************************************************"

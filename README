@@ -1,12 +1,18 @@
-#Need Cython version >0.19
+#requires Cython version >0.19
 tar -zxvf Cython-0.20.1.tar.gz
 cd Cython-0.20.1
 python setup.py install
 
-Scipy packages:
-http://www.scipy.org/install.html
+#requires additional python packages: scipy, numpy and matplotlib:
+#http://www.scipy.org/install.html
+#on linux:
 sudo apt-get install python-numpy python-scipy python-matplotlib ipython ipython-notebook python-pandas python-sympy python-nose
 
-export PYTHONPATH=${PYTHONPATH}:/home/philip/workspace/wordcup/src
 
+
+
+#export code to python path
+export PYTHONPATH=${PYTHONPATH}:/home/philip/workspace/wordcup/src
+#run code
+python main.py
 

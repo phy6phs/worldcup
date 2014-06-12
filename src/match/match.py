@@ -3,17 +3,14 @@ Created on May 27, 2014
 
 @author: philip
 '''
-#import sys
-#print sys.path
-#sys.path.append('../src')
-from team.team import Team #works for eclipse
+
+from team.team import Team 
 import numpy as np
 
 class Match(object):
     '''
     match between two teams
     '''
-    '''constructor'''
     def __init__(self, init_team_a, init_team_b):
         self.team_a = init_team_a
         self.team_b = init_team_b
@@ -34,7 +31,7 @@ class Match(object):
         self.goals_a = r1
         self.goals_b = r2
 
-        print team_a.name," ", r1, " - ", r2, " ", team_b.name
+#        print team_a.name," ", r1, " - ", r2, " ", team_b.name
     
     def set_continent_factor(self, cont1, cont2):
         """ numbers derived from last three world cups, weights for continents teams to get through to last 16"""
@@ -50,13 +47,16 @@ class GroupMatch(Match):
         team_b = self.team_b
         
         home_factor = 1
+        away_factor = 1
         if team_a.name == "Brazil":
-            home_factor = 1.4
+            home_factor = 1.2
+            away_factor = 0.8
         if team_b.name == "Brazil":
-            home_factor = 1.4
+            away_factor = 1.2
+            home_factor = 0.8
         
         goals_a = home_factor*self.cont_a_fact*(team_a.goals_scored_per_game+team_b.goals_conceded_per_game)/2
-        goals_b = home_factor*self.cont_b_fact*(team_a.goals_conceded_per_game+team_b.goals_scored_per_game)/2
+        goals_b = away_factor*self.cont_b_fact*(team_a.goals_conceded_per_game+team_b.goals_scored_per_game)/2
         r1 = np.random.poisson(goals_a)
         r2 = np.random.poisson(goals_b)
         self.goals_a = r1
@@ -76,7 +76,7 @@ class GroupMatch(Match):
         team_a.group_goals_conceded += r2
         team_b.group_goals_conceded += r1
           
-        print team_a.name," ", r1, " - ", r2, " ", team_b.name
+#        print team_a.name," ", r1, " - ", r2, " ", team_b.name
 
 class KOMatch(Match):
     def __init__(self, init_team_a, init_team_b, init_stage):
@@ -96,13 +96,16 @@ class KOMatch(Match):
         team_b = self.team_b
 
         home_factor = 1
+        away_factor = 1
         if team_a.name == "Brazil":
-            home_factor = 1.4
+            home_factor = 1.2
+            away_factor = 0.8
         if team_b.name == "Brazil":
-            home_factor = 1.4
+            away_factor = 1.2
+            home_factor = 0.8
         
         goals_a = home_factor*self.cont_a_fact*(team_a.goals_scored_per_game+team_b.goals_conceded_per_game)/2
-        goals_b = home_factor*self.cont_b_fact*(team_a.goals_conceded_per_game+team_b.goals_scored_per_game)/2
+        goals_b = away_factor*self.cont_b_fact*(team_a.goals_conceded_per_game+team_b.goals_scored_per_game)/2
         r1 = np.random.poisson(goals_a)
         r2 = np.random.poisson(goals_b)
         self.goals_a = r1
@@ -129,7 +132,7 @@ class KOMatch(Match):
         if self.stage == "Final":
             self.win.n_win_final += 1
                 
-        print team_a.name," ", r1, " - ", r2, " ", team_b.name
+#        print team_a.name," ", r1, " - ", r2, " ", team_b.name
     
     def increment_ko(self, team_lose):
         if self.stage == "16":
@@ -141,25 +144,3 @@ class KOMatch(Match):
         elif self.stage == "Final":
             team_lose.n_ru_final += 1    
             
-        
-#Brazil = Team("Brazil")
-##Brazil.print_games_and_goals()
-#Argentina = Team("Argentina")
-#Match1 = Match(Brazil, Argentina, True)
-#
-##test for random matches
-#home_wins = 0
-#away_wins = 0
-#tot_goals = 0
-#for x in range(0,10000):
-#    Match1.play_match()
-#    tot_goals += Match1.goals_a + Match1.goals_b
-#    if Match1.goals_a > Match1.goals_b:
-#        home_wins+=1
-#    if Match1.goals_a < Match1.goals_b:
-#        away_wins+=1
-#
-#print "home wins: ",     home_wins
-#print "away wins: ",     away_wins
-#print "ave goals: ",     float(tot_goals)/10000
-#print "home pts: ",      Brazil.group_pts
